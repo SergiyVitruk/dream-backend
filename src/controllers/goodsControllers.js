@@ -1,17 +1,19 @@
 import { Good } from '../models/good.js';
+import createHttpError from 'http-errors';
 
 export const getGoods = async (req, res) => {
   const goods = await Good.find();
   res.status(200).json(goods);
 };
 
-export const getGoodsById = async (req, res) => {
-   const { goodId } = req.params;
-   const good = await Good.findById(goodId);
+export const getGoodsById = async (req, res, next) => {
+  const { goodId } = req.params;
+  const good = await Good.findById(goodId);
 
-   if (!good) {
-     return res.status(404).json({ message: 'Good not found' });
-   }
+  if (!good) {
+    next(createHttpError(404, 'Good not found'));
+    return;
+  }
 
-   res.status(200).json(good);
+  res.status(200).json(good);
 };
