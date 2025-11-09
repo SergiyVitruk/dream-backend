@@ -1,7 +1,8 @@
 import { Feedback } from '../models/feedback.js';
 
 export const getFeedbacks = async (req, res) => {
-  const feedbacks = await Feedback.find();
+  const feedbacks = await Feedback.find().populate('category', 'name');
+
   res.status(200).json(feedbacks);
 };
 
