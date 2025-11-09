@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import helmet from 'helmet';
+import { errors } from 'celebrate';
 
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
@@ -12,17 +13,24 @@ import goodsRoutes from './routes/goodsRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 
+import authRoutes from './routes/authRoutes.js';
+import cookieParser from 'cookie-parser';
+
 const app = express();
 const PORT = process.env.PORT ?? 3030;
 
 app.use(logger);
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 app.use(helmet());
 
+app.use(authRoutes);
 app.use(goodsRoutes);
 app.use(categoriesRoutes);
 app.use(feedbackRoutes);
+
+app.use(errors());
 
 app.use(notFoundHandler);
 app.use(errorHandler);
