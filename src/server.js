@@ -9,6 +9,8 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { connectMongoDB } from './db/connectMongoDB.js';
 
 import goodsRoutes from './routes/goodsRoutes.js';
+import categoriesRoutes from './routes/categoriesRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
@@ -18,11 +20,9 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hello, World!' });
-});
-
 app.use(goodsRoutes);
+app.use(categoriesRoutes);
+app.use(feedbackRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
