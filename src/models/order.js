@@ -81,6 +81,11 @@ const orderSchema = new Schema(
       enum: ['pending', 'processing', 'shipped', 'completed', 'cancelled'],
       default: 'pending',
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
+    },
   },
   {
     timestamps: true,
