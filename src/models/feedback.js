@@ -15,15 +15,14 @@ const feedbackSchema = new Schema(
       required: true,
     },
     category: {
-      type: Schema.Types.ObjectId,
-      ref: 'Category',
+      type: String,
       required: true,
     },
     productId: {
-            type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Good',
       required: true,
-    }
+    },
   },
   {
     timestamps: true,

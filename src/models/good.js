@@ -63,4 +63,10 @@ const goodSchema = new Schema(
   },
 );
 
+goodSchema.index({ category: 1 });
+goodSchema.index({ gender: 1 });
+goodSchema.index({ 'price.value': 1 });
+goodSchema.index({ size: 1 });
+goodSchema.index({ category: 1, gender: 1, 'price.value': 1 });
+
 export const Good = model('Good', goodSchema);

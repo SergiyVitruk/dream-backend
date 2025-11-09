@@ -11,6 +11,8 @@ import { connectMongoDB } from './db/connectMongoDB.js';
 import goodsRoutes from './routes/goodsRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import ordersRoutes from './routes/ordersRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
@@ -22,7 +24,9 @@ app.use(helmet());
 
 app.use(goodsRoutes);
 app.use(categoriesRoutes);
+app.use(ordersRoutes);
 app.use(feedbackRoutes);
+app.use(subscriptionRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
