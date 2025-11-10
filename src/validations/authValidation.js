@@ -2,7 +2,7 @@ import { Joi, Segments } from 'celebrate';
 
 export const registerUserSchema = {
   [Segments.BODY]: Joi.object({
-    username: Joi.string().min(3).max(30).required().messages({
+    name: Joi.string().min(3).max(30).required().messages({
       'string.empty': 'Поле "username" є обов’язковим',
       'string.min': 'Ім’я користувача має містити щонайменше 3 символи',
       'any.required': 'Поле "username" є обов’язковим',
