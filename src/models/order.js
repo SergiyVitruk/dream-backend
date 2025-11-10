@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { STATUS } from '../constants/filter.js';
 
 const orderItemSchema = new Schema(
   {
@@ -78,7 +79,7 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'completed', 'cancelled'],
+      enum: STATUS,
       default: 'pending',
     },
     userId: {

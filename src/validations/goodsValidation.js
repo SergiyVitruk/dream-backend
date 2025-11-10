@@ -1,5 +1,6 @@
 import { Joi, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
+import { GENDERS, SIZES } from '../constants/filter.js';
 
 const objectIdValidator = (value, helpers) => {
   return !isValidObjectId(value) ? helpers.message('Invalid id format') : value;
@@ -43,12 +44,12 @@ export const getGoodsSchema = {
       'number.positive': 'Maximum price must be positive',
     }),
 
-    size: Joi.string().valid('XS', 'S', 'M', 'L', 'XL', 'XXL').messages({
+    size: Joi.string().valid(...SIZES).messages({
       'string.base': 'Size must be a string',
       'any.only': 'Size must be one of XS, S, M, L, XL, XXL',
     }),
 
-    gender: Joi.string().valid('man', 'women', 'unisex'),
+    gender: Joi.string().valid(...GENDERS),
   }).messages({
     'string.base': 'Gender must be a string',
     'any.only': 'Gender must be one of: man, women, unisex',
