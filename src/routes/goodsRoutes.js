@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { celebrate } from 'celebrate';
 import { getGoods, getGoodsById } from '../controllers/goodsControllers.js';
-import { getGoodsSchema, goodIdParamSchema } from '../validations/goodsValidation.js';
+import {
+  getGoodsSchema,
+  goodIdParamSchema,
+} from '../validations/goodsValidation.js';
 
 const router = Router();
 
