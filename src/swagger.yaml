@@ -1,0 +1,562 @@
+openapi: 3.0.4
+info:
+  title: Clothica Shop API
+  description: >
+    API для інтернет-магазину Clothica.
+    Тут описано всі доступні ендпоінти для роботи з користувачами, товарами, замовленнями, категоріями, відгуками та підписками.
+    Підтримуються як публічні, так і приватні маршрути з авторизацією через cookie.
+  version: 0.0.1
+servers:
+  - url: https://dream-backend-a69s.onrender.com/
+
+paths:
+  /auth/register:
+    post:
+      summary: Реєстрація нового користувача
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - phone
+                - password
+              properties:
+                username:
+                  type: string
+                  example: 'Sergiy'
+                phone:
+                  type: string
+                  example: '+380971234567'
+                password:
+                  type: string
+                  example: 'securePassword123'
+      responses:
+        '201':
+          description: Користувача успішно створено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Користувача успішно створено'
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Номер телефону вже використовується
+
+  /auth/login:
+    post:
+      summary: Вхід користувача
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - password
+              properties:
+                phone:
+                  type: string
+                  example: '+380971234567'
+                password:
+                  type: string
+                  example: 'securePassword123'
+      responses:
+        '200':
+          description: Вхід виконано успішно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Вхід виконано успішно'
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Невірний номер телефону або пароль
+
+  /auth/logout:
+    post:
+      summary: Вихід користувача
+      tags:
+        - Auth
+      responses:
+        '204':
+          description: Користувач вийшов, сесія видалена
+
+  /auth/refresh:
+    post:
+      summary: Оновлення сесії користувача
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Сесія оновлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Сесія оновлена'
+        '401':
+          description: Session not found або Session token expired
+
+  /users/me:
+    get:
+      summary: Отримати інформацію про поточного користувача
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Дані користувача
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Неавторизований
+
+    patch:
+      summary: Оновлення даних користувача
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: 'Sergiy'
+                phone:
+                  type: string
+                  example: '+380971234567'
+      responses:
+        '200':
+          description: Дані оновлені
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Неавторизований
+
+  /categories:
+    get:
+      summary: Отримати список категорій з пагінацією
+      tags:
+        - Categories
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список категорій
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+  /goods:
+    get:
+      summary: Отримати список товарів з фільтрами та пагінацією
+      tags:
+        - Goods
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: priceMin
+          schema:
+            type: number
+        - in: query
+          name: priceMax
+          schema:
+            type: number
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список товарів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Good'
+
+  /goods/{id}:
+    get:
+      summary: Отримати деталі товару за ID
+      tags:
+        - Goods
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Деталі товару
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Good'
+        '404':
+          description: Товар не знайдено
+
+  /orders:
+    post:
+      summary: Оформлення замовлення
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Замовлення створено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Помилка оформлення
+
+    get:
+      summary: Отримати всі замовлення користувача
+      tags:
+        - Orders
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Список замовлень користувача
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '401':
+          description: Неавторизований
+
+  /orders/{id}/status:
+    patch:
+      summary: Зміна статусу замовлення (тільки admin)
+      tags:
+        - Orders
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  example: 'shipped'
+      responses:
+        '200':
+          description: Статус замовлення оновлено
+        '403':
+          description: Користувач не admin
+        '404':
+          description: Замовлення не знайдено
+
+  /feedbacks:
+    post:
+      summary: Створення відгуку
+      tags:
+        - Feedbacks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackInput'
+      responses:
+        '201':
+          description: Відгук створено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        '400':
+          description: Помилка створення відгуку
+
+    get:
+      summary: Отримати список відгуків
+      tags:
+        - Feedbacks
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список відгуків
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+
+  /subscriptions:
+    post:
+      summary: Створення запиту на підписку
+      tags:
+        - Subscriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+      responses:
+        '201':
+          description: Підписка створена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Помилка створення підписки
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '64f5b1c8b6e1f9a123456789'
+        username:
+          type: string
+          example: 'Sergiy'
+        phone:
+          type: string
+          example: '+380971234567'
+
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '690c9ce6a6276289c98fc006'
+        name:
+          type: string
+          example: 'Футболки та сорочки'
+
+    Good:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '6877b9f116ae59c7b60d0107'
+        name:
+          type: string
+          example: "Світшот 'Minimal Black'"
+        category:
+          type: string
+          example: '690c9ce6a6276289c98fc006'
+        image:
+          type: string
+          example: 'https://ftp.goit.study/img/goods/6877b9f116ae59c7b60d0107.webp'
+        price:
+          type: object
+          properties:
+            value:
+              type: number
+              example: 1299
+            currency:
+              type: string
+              example: 'грн'
+        size:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        feedbacks:
+          type: array
+          items:
+            type: string
+        prevDescription:
+          type: string
+        gender:
+          type: string
+        characteristics:
+          type: array
+          items:
+            type: string
+
+    OrderInput:
+      type: object
+      required:
+        - userId
+        - goods
+      properties:
+        userId:
+          type: string
+        goods:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              quantity:
+                type: number
+
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        goods:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              quantity:
+                type: number
+        status:
+          type: string
+          example: 'pending'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FeedbackInput:
+      type: object
+      required:
+        - userId
+        - message
+        - rating
+      properties:
+        userId:
+          type: string
+        message:
+          type: string
+        rating:
+          type: number
+        category:
+          type: string
+        productId:
+          type: string
+
+    Feedback:
+      type: object
+      properties:
+        _id:
+          type: string
+        author:
+          type: string
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        rate:
+          type: number
+        category:
+          type: string
+        productId:
+          type: string
+
+    Subscription:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '690de2a1b6e1f9a123456abc'
+        email:
+          type: string
+          example: 'user@example.com'
+        createdAt:
+          type: string
+          format: date-time
