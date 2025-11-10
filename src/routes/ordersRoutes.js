@@ -5,9 +5,11 @@ import {
   createOrder,
   getUserOrders,
   updateOrderStatus,
-  updateOrderStatusSchema,
 } from '../controllers/ordersControllers.js';
-import { createOrderSchema } from '../validations/orderValidation.js';
+import {
+  createOrderSchema,
+  updateOrderStatusSchema,
+} from '../validations/orderValidation.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 
 const router = Router();
