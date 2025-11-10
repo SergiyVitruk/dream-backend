@@ -18,6 +18,8 @@ import ordersRoutes from './routes/ordersRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
 
+import usersRoutes from './routes/usersRoutes.js';
+
 const app = express();
 const PORT = process.env.PORT ?? 3030;
 
@@ -28,6 +30,7 @@ app.use(cookieParser());
 app.use(helmet());
 
 app.use(authRoutes);
+app.use(usersRoutes);
 app.use(goodsRoutes);
 app.use(categoriesRoutes);
 app.use(ordersRoutes);
