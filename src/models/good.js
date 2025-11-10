@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { GENDERS, SIZES } from '../constants/filter.js';
 
 const goodSchema = new Schema(
   {
@@ -30,7 +31,7 @@ const goodSchema = new Schema(
     size: {
       type: [String],
       required: true,
-      enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+      enum: SIZES,
     },
     description: {
       type: String,
@@ -49,7 +50,7 @@ const goodSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ['man', 'women', 'unisex'],
+      enum: GENDERS,
       required: true,
     },
     characteristics: {

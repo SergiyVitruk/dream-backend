@@ -1,5 +1,6 @@
 import { Joi, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
+import { STATUS } from '../constants/filter.js';
 
 const objectIdValidator = (value, helpers) => {
   return !isValidObjectId(value)
@@ -87,5 +88,17 @@ export const createOrderSchema = {
     comment: Joi.string().max(500).allow('', null).messages({
       'string.max': 'Comment must be less than 500 characters',
     }),
+  }),
+};
+
+export const updateOrderStatusSchema = {
+  [Segments.BODY]: Joi.object({
+    status: Joi.string()
+      .valid(...STATUS)
+      .required()
+      .messages({
+        'any.required': 'Status is required',
+        'any.only': `Status must be one of: ${STATUS.join(', ')}`,
+      }),
   }),
 };
