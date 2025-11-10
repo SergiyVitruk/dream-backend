@@ -25,6 +25,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const swaggerDocument = YAML.load(path.join(__dirname, './swagger.yaml'));
 
+import usersRoutes from './routes/usersRoutes.js';
+
 const app = express();
 const PORT = process.env.PORT ?? 3030;
 
@@ -37,6 +39,7 @@ app.use(helmet());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(authRoutes);
+app.use(usersRoutes);
 app.use(goodsRoutes);
 app.use(categoriesRoutes);
 app.use(ordersRoutes);
