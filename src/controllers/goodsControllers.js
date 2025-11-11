@@ -12,8 +12,8 @@ export const getGoods = async (req, res, next) => {
       priceMin,
       priceMax,
     } = req.query;
-    const skip = (page - 1) * perPage;
 
+    const skip = (page - 1) * perPage;
     const goodsQuery = Good.find();
 
     if (category) goodsQuery.where('category').equals(category);
@@ -27,14 +27,13 @@ export const getGoods = async (req, res, next) => {
       goodsQuery.where('price.value', filter);
     }
 
-    const [totalItems, goods] = await Promise.all([
-      goodsQuery.clone().countDocuments(),
-      goodsQuery
-        .skip(skip)
-        .limit(Number(perPage))
-        .populate('category', 'name')
-        .populate('feedbacks', 'author rate description -_id'),
-    ]);
+    const totalItems = await goodsQuery.clone().countDocuments();
+
+    const goods = await goodsQuery
+      .skip(skip)
+      .limit(Number(perPage))
+      .populate('category', 'name')
+      .populate('feedbacks', 'author description rate -_id');
 
     const totalPages = Math.ceil(totalItems / perPage);
 
