@@ -11,10 +11,16 @@ import {
   updateOrderStatusSchema,
 } from '../validations/orderValidation.js';
 import { isAdmin } from '../middleware/isAdmin.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 
 const router = Router();
 
-router.post('/api/orders', celebrate(createOrderSchema), createOrder);
+router.post(
+  '/api/orders',
+  optionalAuth,
+  celebrate(createOrderSchema),
+  createOrder,
+);
 router.get('/api/orders/my', authenticate, getUserOrders);
 router.patch(
   '/api/orders/:id/status',
