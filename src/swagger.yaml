@@ -151,6 +151,9 @@ paths:
                 name:
                   type: string
                   example: 'Oleksii'
+                surname:
+                  type: string
+                  example: 'Ivanenko'
                 phone:
                   type: string
                   example: '+380971234566'
@@ -431,7 +434,9 @@ components:
       example:
         _id: '64fcadca3b03df2c7a1cba12'
         name: 'Oleksii'
+        surname: 'Ivanenko'
         phone: '+380971234566'
+        role: 'user'
         updatedAt: '2025-11-11T09:12:32.000Z'
 
     Category:
@@ -472,22 +477,28 @@ components:
           type: array
           items:
             type: string
+          example: ['XL', 'XS', 'S', 'M', 'L', 'XXL']
         description:
           type: string
+          example: 'Світшот Minimal Black — втілення стриманості та універсальності. Його дизайн побудований на простоті: глибокий чорний колір, акуратний круглий виріз і прямий крій. Тканина — м’який трикотаж із високим вмістом бавовни, що забезпечує комфорт у щоденному носінні. Завдяки універсальному стилю цей світшот легко поєднується як зі спортивним одягом, так і з джинсами чи навіть класичними брюками. Його можна використовувати як базовий шар під куртку або носити самостійно. Модель не має зайвих деталей, проте саме ця мінімалістичність робить її актуальною та довговічною. Minimal Black — це стильний вибір для тих, хто цінує простоту й практичність.'
         feedbacks:
           type: array
           items:
             type: string
+          example: ['64f5b1c8b6e1f9a123456789']
         prevDescription:
           type: string
+          example: 'Світшот Minimal Black — втілення стриманості. Глибокий чорний колір, акуратний крій та м'яка тканина (трикотаж з високим вмістом бавовни) забезпечують комфорт. Ця базова річ універсальна: пасує до джинсів, спортивного одягу чи класичних брюк. Ідеальний вибір.'
         gender:
           type: string
+          example: 'unisex'
         characteristics:
           type: array
           items:
             type: string
+          example: ['Матеріал: 80% бавовна, 20% поліестер', 'Крій: прямий', 'Горловина: круглий виріз', 'Сезон: Осінь/Зима/Весна']
 
-    OrderGoodsItem:
+          OrderGoodsItem:
       type: object
       properties:
         productId:
@@ -575,8 +586,10 @@ components:
       properties:
         _id:
           type: string
+          example: '69135246d77bd9a8f9389459'
         userId:
           type: string
+          example: '64f5b1c8b6e1f9a123456789'
         goods:
           type: array
           items:
@@ -602,34 +615,47 @@ components:
       properties:
         userId:
           type: string
+          example: '64f5b1c8b6e1f9a123456789'
         message:
           type: string
+          example: 'Чудовий світшот, дуже зручно носити.'
         rate:
           type: number
+          example: 5
         category:
           type: string
+          example: 'Футболки та сорочки'
         productId:
           type: string
+          example: '6877b9f116ae59c7b60d0107'
 
     Feedback:
       type: object
       properties:
         author:
           type: string
+          example: 'Sergiy Ivanenko'
         description:
           type: string
+          example: 'Чудовий світшот, дуже зручно носити.'
         rate:
           type: number
+          example: 5
         category:
           type: string
+          example: 'Футболки та сорочки'
         productId:
           type: string
+          example: '6877b9f116ae59c7b60d0107'
         _id:
           type: string
+          example: '64f5b1c8b6e1f9a123456789'
         createdAt:
           type: string
+          example: '2025-11-11T19:35:00.000Z'
         updatedAt:
           type: string
+          example: '2025-11-11T19:35:00.000Z'
 
     Subscription:
       type: object
@@ -643,3 +669,4 @@ components:
         createdAt:
           type: string
           format: date-time
+          example: '2025-11-11T18:00:00.000Z'
