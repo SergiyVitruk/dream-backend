@@ -29,7 +29,11 @@ export const getGoods = async (req, res, next) => {
 
     const [totalItems, goods] = await Promise.all([
       goodsQuery.clone().countDocuments(),
-      goodsQuery.skip(skip).limit(Number(perPage)).populate('category', 'name'),
+      goodsQuery
+        .skip(skip)
+        .limit(Number(perPage))
+        .populate('category', 'name')
+        .populate('feedbacks', 'author rate description -_id'),
     ]);
 
     const totalPages = Math.ceil(totalItems / perPage);
