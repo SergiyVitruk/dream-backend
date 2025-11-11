@@ -5,7 +5,7 @@ info:
     API для інтернет-магазину Clothica.
     Тут описано всі доступні ендпоінти для роботи з користувачами, товарами, замовленнями, категоріями, відгуками та підписками.
     Підтримуються як публічні, так і приватні маршрути з авторизацією через cookie.
-  version: 1.0.0
+  version: 1.0.1
 
 servers:
   - url: https://dream-backend-a69s.onrender.com/
@@ -32,6 +32,7 @@ paths:
                   example: 'Sergiy'
                 phone:
                   type: string
+                  pattern: '^\\+380\\d{9}$'
                   example: '+380971234567'
                 password:
                   type: string
@@ -497,6 +498,25 @@ components:
             type: string
           example: ['Матеріал: 80% бавовна, 20% поліестер', 'Крій: прямий', 'Горловина: круглий виріз', 'Сезон: Осінь/Зима/Весна']
 
+          OrderGoodsItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: '671fbb85ec7f5f1d6b65f2a9'
+        title:
+          type: string
+          example: 'Сорочка чоловіча'
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          example: 850
+        total:
+          type: number
+          example: 1700
+
     OrderInput:
       type: object
       required:
@@ -511,29 +531,7 @@ components:
           type: array
           description: Список товарів у замовленні
           items:
-            type: object
-            required:
-              - productId
-              - title
-              - quantity
-              - price
-              - total
-            properties:
-              productId:
-                type: string
-                example: '671fbb85ec7f5f1d6b65f2a9'
-              title:
-                type: string
-                example: 'Сорочка чоловіча'
-              quantity:
-                type: integer
-                example: 2
-              price:
-                type: number
-                example: 850
-              total:
-                type: number
-                example: 1700
+            $ref: '#/components/schemas/OrderGoodsItem'
         name:
           type: string
           example: 'Олексій'
@@ -568,7 +566,7 @@ components:
             goods:
               type: array
               items:
-                $ref: '#/components/schemas/OrderInput/properties/goods/items'
+                $ref: '#/components/schemas/OrderGoodsItem'
             totalAmount:
               type: number
               example: 1700
@@ -595,12 +593,7 @@ components:
         goods:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: string
-              quantity:
-                type: number
+            $ref: '#/components/schemas/OrderGoodsItem'
         status:
           type: string
           example: 'pending'
