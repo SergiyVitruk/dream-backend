@@ -498,7 +498,7 @@ components:
             type: string
           example: ['Матеріал: 80% бавовна, 20% поліестер', 'Крій: прямий', 'Горловина: круглий виріз', 'Сезон: Осінь/Зима/Весна']
 
-          OrderGoodsItem:
+    OrderGoodsItem:
       type: object
       properties:
         productId:
