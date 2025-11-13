@@ -257,8 +257,6 @@ paths:
       summary: Оформлення замовлення
       tags:
         - Orders
-      security:
-        - cookieAuth: []
       requestBody:
         required: true
         content:
