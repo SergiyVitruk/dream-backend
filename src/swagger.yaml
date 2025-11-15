@@ -461,15 +461,27 @@ components:
           example: 'user'
 
     UpdatedUserResponse:
-      allOf:
-        - $ref: '#/components/schemas/User'
-      example:
-        _id: '64fcadca3b03df2c7a1cba12'
-        name: 'Oleksii'
-        surname: 'Ivanenko'
-        phone: '+380971234566'
-        role: 'user'
-        updatedAt: '2025-11-11T09:12:32.000Z'
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '64fcadca3b03df2c7a1cba12'
+        name:
+          type: string
+          example: 'Oleksii'
+        surname:
+          type: string
+          example: 'Ivanenko'
+        phone:
+          type: string
+          example: '+380971234566'
+        role:
+          type: string
+          example: 'user'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-11-11T09:12:32.000Z'
 
     Category:
       type: object
