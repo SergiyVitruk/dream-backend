@@ -177,21 +177,39 @@ paths:
           name: page
           schema:
             type: integer
+            minimum: 1
             default: 1
         - in: query
-          name: limit
+          name: perPage
           schema:
             type: integer
-            default: 10
+            minimum: 3
+            maximum: 24
+            default: 6
       responses:
         '200':
           description: Список категорій
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Category'
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  perPage:
+                    type: integer
+                    example: 6
+                  totalItems:
+                    type: integer
+                    example: 34
+                  totalPages:
+                    type: integer
+                    example: 6
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
 
   /api/goods:
     get:
@@ -200,7 +218,20 @@ paths:
         - Goods
       parameters:
         - in: query
-          name: categoryId
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+            minimum: 4
+            maximum: 24
+            default: 8
+        - in: query
+          name: category
           schema:
             type: string
         - in: query
@@ -212,25 +243,39 @@ paths:
           schema:
             type: number
         - in: query
-          name: page
+          name: size
           schema:
-            type: integer
-            default: 1
+            type: string
+            enum: [XS, S, M, L, XL, XXL]
         - in: query
-          name: limit
+          name: gender
           schema:
-            type: integer
-            default: 10
+            type: string
+            enum: [man, women, unisex]
       responses:
         '200':
           description: Список товарів
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Good'
-
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  perPage:
+                    type: integer
+                    example: 8
+                  totalItems:
+                    type: integer
+                    example: 108
+                  totalPages:
+                    type: integer
+                    example: 14
+                  goods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Good'
   /api/goods/{id}:
     get:
       summary: Отримати деталі товару за ID
@@ -244,7 +289,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Деталі товару
+          description: Товар знайдено
           content:
             application/json:
               schema:
@@ -323,7 +368,7 @@ paths:
         '200':
           description: Статус замовлення оновлено
         '403':
-          description: Access denied. Admins only.
+          description: Access denied. Admins only
 
   /api/feedbacks:
     post:
@@ -350,17 +395,6 @@ paths:
       summary: Отримати список відгуків
       tags:
         - Feedbacks
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 10
       responses:
         '200':
           description: Список відгуків
@@ -611,16 +645,16 @@ components:
     FeedbackInput:
       type: object
       required:
-        - userId
-        - message
+        - author
+        - description
         - rate
         - category
         - productId
       properties:
-        userId:
+        author:
           type: string
-          example: '64f5b1c8b6e1f9a123456789'
-        message:
+          example: 'Ганна'
+        description:
           type: string
           example: 'Чудовий світшот, дуже зручно носити.'
         rate:
@@ -636,9 +670,12 @@ components:
     Feedback:
       type: object
       properties:
+        _id:
+          type: string
+          example: '64f5b1c8b6e1f9a123456789'
         author:
           type: string
-          example: 'Sergiy Ivanenko'
+          example: 'Ганна'
         description:
           type: string
           example: 'Чудовий світшот, дуже зручно носити.'
@@ -651,14 +688,13 @@ components:
         productId:
           type: string
           example: '6877b9f116ae59c7b60d0107'
-        _id:
-          type: string
-          example: '64f5b1c8b6e1f9a123456789'
         createdAt:
           type: string
+          format: date-time
           example: '2025-11-11T19:35:00.000Z'
         updatedAt:
           type: string
+          format: date-time
           example: '2025-11-11T19:35:00.000Z'
 
     Subscription:
