@@ -5,12 +5,13 @@ info:
     API для інтернет-магазину Clothica.
     Тут описано всі доступні ендпоінти для роботи з користувачами, товарами, замовленнями, категоріями, відгуками та підписками.
     Підтримуються як публічні, так і приватні маршрути з авторизацією через cookie.
-  version: 0.0.1
+  version: 1.0.1
+
 servers:
   - url: https://dream-backend-a69s.onrender.com/
 
 paths:
-  /auth/register:
+  /api/auth/register:
     post:
       summary: Реєстрація нового користувача
       tags:
@@ -22,15 +23,16 @@ paths:
             schema:
               type: object
               required:
-                - username
+                - name
                 - phone
                 - password
               properties:
-                username:
+                name:
                   type: string
                   example: 'Sergiy'
                 phone:
                   type: string
+                  pattern: '^\\+380\\d{9}$'
                   example: '+380971234567'
                 password:
                   type: string
@@ -49,9 +51,9 @@ paths:
                   user:
                     $ref: '#/components/schemas/User'
         '400':
-          description: Номер телефону вже використовується
+          description: Цей номер телефону вже використовується
 
-  /auth/login:
+  /api/auth/login:
     post:
       summary: Вхід користувача
       tags:
@@ -88,23 +90,23 @@ paths:
         '401':
           description: Невірний номер телефону або пароль
 
-  /auth/logout:
+  /api/auth/logout:
     post:
       summary: Вихід користувача
       tags:
         - Auth
       responses:
         '204':
-          description: Користувач вийшов, сесія видалена
+          description: Вихід успішний
 
-  /auth/refresh:
+  /api/auth/refresh:
     post:
       summary: Оновлення сесії користувача
       tags:
         - Auth
       responses:
         '200':
-          description: Сесія оновлена
+          description: Session refreshed
           content:
             application/json:
               schema:
@@ -112,11 +114,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Сесія оновлена'
+                    example: 'Session refreshed'
         '401':
-          description: Session not found або Session token expired
+          description: Session not found
 
-  /users/me:
+  /api/users/current:
     get:
       summary: Отримати інформацію про поточного користувача
       tags:
@@ -131,7 +133,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '401':
-          description: Неавторизований
+          description: Missing access token
 
     patch:
       summary: Оновлення даних користувача
@@ -146,23 +148,26 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                name:
                   type: string
-                  example: 'Sergiy'
+                  example: 'Oleksii'
+                surname:
+                  type: string
+                  example: 'Ivanenko'
                 phone:
                   type: string
-                  example: '+380971234567'
+                  example: '+380971234566'
       responses:
         '200':
           description: Дані оновлені
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UpdatedUserResponse'
         '401':
-          description: Неавторизований
+          description: Missing access token
 
-  /categories:
+  /api/categories:
     get:
       summary: Отримати список категорій з пагінацією
       tags:
@@ -172,30 +177,61 @@ paths:
           name: page
           schema:
             type: integer
+            minimum: 1
             default: 1
         - in: query
-          name: limit
+          name: perPage
           schema:
             type: integer
-            default: 10
+            minimum: 3
+            maximum: 24
+            default: 6
       responses:
         '200':
           description: Список категорій
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Category'
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  perPage:
+                    type: integer
+                    example: 6
+                  totalItems:
+                    type: integer
+                    example: 34
+                  totalPages:
+                    type: integer
+                    example: 6
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
 
-  /goods:
+  /api/goods:
     get:
       summary: Отримати список товарів з фільтрами та пагінацією
       tags:
         - Goods
       parameters:
         - in: query
-          name: categoryId
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+            minimum: 4
+            maximum: 24
+            default: 8
+        - in: query
+          name: category
           schema:
             type: string
         - in: query
@@ -207,26 +243,40 @@ paths:
           schema:
             type: number
         - in: query
-          name: page
+          name: size
           schema:
-            type: integer
-            default: 1
+            type: string
+            enum: [XS, S, M, L, XL, XXL]
         - in: query
-          name: limit
+          name: gender
           schema:
-            type: integer
-            default: 10
+            type: string
+            enum: [man, women, unisex]
       responses:
         '200':
           description: Список товарів
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Good'
-
-  /goods/{id}:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  perPage:
+                    type: integer
+                    example: 8
+                  totalItems:
+                    type: integer
+                    example: 108
+                  totalPages:
+                    type: integer
+                    example: 14
+                  goods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Good'
+  /api/goods/{id}:
     get:
       summary: Отримати деталі товару за ID
       tags:
@@ -239,15 +289,15 @@ paths:
             type: string
       responses:
         '200':
-          description: Деталі товару
+          description: Товар знайдено
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Good'
         '404':
-          description: Товар не знайдено
+          description: Good not found
 
-  /orders:
+  /api/orders:
     post:
       summary: Оформлення замовлення
       tags:
@@ -260,14 +310,17 @@ paths:
               $ref: '#/components/schemas/OrderInput'
       responses:
         '201':
-          description: Замовлення створено
+          description: Замовлення створено успішно
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderResponse'
         '400':
-          description: Помилка оформлення
+          description: Невірні дані або помилка оформлення
+        '401':
+          description: Missing access token
 
+  /api/orders/my:
     get:
       summary: Отримати всі замовлення користувача
       tags:
@@ -284,9 +337,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Order'
         '401':
-          description: Неавторизований
+          description: Missing access token
 
-  /orders/{id}/status:
+  /api/orders/{id}/status:
     patch:
       summary: Зміна статусу замовлення (тільки admin)
       tags:
@@ -315,11 +368,9 @@ paths:
         '200':
           description: Статус замовлення оновлено
         '403':
-          description: Користувач не admin
-        '404':
-          description: Замовлення не знайдено
+          description: Access denied. Admins only
 
-  /feedbacks:
+  /api/feedbacks:
     post:
       summary: Створення відгуку
       tags:
@@ -338,23 +389,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Feedback'
         '400':
-          description: Помилка створення відгуку
+          description: Validation failed
 
     get:
       summary: Отримати список відгуків
       tags:
         - Feedbacks
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 10
       responses:
         '200':
           description: Список відгуків
@@ -365,7 +405,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Feedback'
 
-  /subscriptions:
+  /api/subscriptions:
     post:
       summary: Створення запиту на підписку
       tags:
@@ -391,7 +431,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Subscription'
         '400':
-          description: Помилка створення підписки
+          description: Validation failed
 
 components:
   securitySchemes:
@@ -407,12 +447,41 @@ components:
         _id:
           type: string
           example: '64f5b1c8b6e1f9a123456789'
-        username:
+        name:
           type: string
           example: 'Sergiy'
+        surname:
+          type: string
+          example: 'Ivanenko'
         phone:
           type: string
           example: '+380971234567'
+        role:
+          type: string
+          example: 'user'
+
+    UpdatedUserResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '64fcadca3b03df2c7a1cba12'
+        name:
+          type: string
+          example: 'Oleksii'
+        surname:
+          type: string
+          example: 'Ivanenko'
+        phone:
+          type: string
+          example: '+380971234566'
+        role:
+          type: string
+          example: 'user'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-11-11T09:12:32.000Z'
 
     Category:
       type: object
@@ -452,55 +521,129 @@ components:
           type: array
           items:
             type: string
+          example: ['XL', 'XS', 'S', 'M', 'L', 'XXL']
         description:
           type: string
+          example: 'Світшот Minimal Black — втілення стриманості та універсальності. Його дизайн побудований на простоті: глибокий чорний колір, акуратний круглий виріз і прямий крій. Тканина — трикотаж із високим вмістом бавовни, що забезпечує комфорт у щоденному носінні. Завдяки універсальному стилю цей світшот легко поєднується як зі спортивним одягом, так і з джинсами чи навіть класичними брюками. Його можна використовувати як базовий шар під куртку або носити самостійно. Модель не має зайвих деталей, проте саме ця мінімалістичність робить її актуальною та довговічною. Minimal Black — це стильний вибір для тих, хто цінує простоту й практичність.'
         feedbacks:
           type: array
           items:
             type: string
+          example: ['64f5b1c8b6e1f9a123456789']
         prevDescription:
           type: string
+          example: 'Світшот Minimal Black — втілення стриманості. Глибокий чорний колір, акуратний крій та тканина (трикотаж з високим вмістом бавовни) забезпечують комфорт. Ця базова річ універсальна: пасує до джинсів, спортивного одягу чи класичних брюк. Ідеальний вибір.'
         gender:
           type: string
+          example: 'unisex'
         characteristics:
           type: array
           items:
             type: string
+          example:
+            [
+              'Матеріал: 79% бавовна, 21% поліестер',
+              'Крій: прямий',
+              'Горловина: круглий виріз',
+              'Сезон: Осінь/Зима/Весна',
+            ]
+
+    OrderGoodsItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: '671fbb85ec7f5f1d6b65f2a9'
+        title:
+          type: string
+          example: 'Сорочка чоловіча'
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          example: 850
+        total:
+          type: number
+          example: 1700
 
     OrderInput:
       type: object
       required:
-        - userId
         - goods
+        - name
+        - surname
+        - phone
+        - city
+        - postNumber
       properties:
-        userId:
-          type: string
         goods:
           type: array
+          description: Список товарів у замовленні
           items:
-            type: object
-            properties:
-              id:
-                type: string
-              quantity:
-                type: number
+            $ref: '#/components/schemas/OrderGoodsItem'
+        name:
+          type: string
+          example: 'Олексій'
+        surname:
+          type: string
+          example: 'Іваненко'
+        phone:
+          type: string
+          example: '+380971234567'
+        city:
+          type: string
+          example: 'Київ'
+        postNumber:
+          type: string
+          example: '12'
+        comment:
+          type: string
+          example: 'Доставити у другій половині дня'
+
+    OrderResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Order created successfully'
+        order:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: '6732aa88b9c5df1234567890'
+            goods:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderGoodsItem'
+            totalAmount:
+              type: number
+              example: 1700
+            status:
+              type: string
+              example: 'pending'
+            userId:
+              type: string
+              example: '672ff3e71c8b1d1234a56789'
+            createdAt:
+              type: string
+              format: date-time
+              example: '2025-11-11T19:35:00.000Z'
 
     Order:
       type: object
       properties:
         _id:
           type: string
+          example: '69135246d77bd9a8f9389459'
         userId:
           type: string
+          example: '64f5b1c8b6e1f9a123456789'
         goods:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: string
-              quantity:
-                type: number
+            $ref: '#/components/schemas/OrderGoodsItem'
         status:
           type: string
           example: 'pending'
@@ -514,39 +657,57 @@ components:
     FeedbackInput:
       type: object
       required:
-        - userId
-        - message
-        - rating
+        - author
+        - description
+        - rate
+        - category
+        - productId
       properties:
-        userId:
+        author:
           type: string
-        message:
+          example: 'Ганна'
+        description:
           type: string
-        rating:
+          example: 'Чудовий світшот, дуже зручно носити.'
+        rate:
           type: number
+          example: 5
         category:
           type: string
+          example: 'Футболки та сорочки'
         productId:
           type: string
+          example: '6877b9f116ae59c7b60d0107'
 
     Feedback:
       type: object
       properties:
         _id:
           type: string
+          example: '64f5b1c8b6e1f9a123456789'
         author:
           type: string
-        date:
-          type: string
-          format: date
+          example: 'Ганна'
         description:
           type: string
+          example: 'Чудовий світшот, дуже зручно носити.'
         rate:
           type: number
+          example: 5
         category:
           type: string
+          example: 'Футболки та сорочки'
         productId:
           type: string
+          example: '6877b9f116ae59c7b60d0107'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-11-11T19:35:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-11-11T19:35:00.000Z'
 
     Subscription:
       type: object
@@ -560,3 +721,4 @@ components:
         createdAt:
           type: string
           format: date-time
+          example: '2025-11-11T18:00:00.000Z'

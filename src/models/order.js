@@ -75,6 +75,7 @@ const orderSchema = new Schema(
     },
     comment: {
       type: String,
+      required: false,
       trim: true,
     },
     status: {
@@ -85,6 +86,7 @@ const orderSchema = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: null,
       required: false,
     },
   },
