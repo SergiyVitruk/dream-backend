@@ -600,6 +600,9 @@ components:
         comment:
           type: string
           example: 'Доставити у другій половині дня'
+        totalAmount:
+          type: number
+          example: 1500
 
     OrderResponse:
       type: object
